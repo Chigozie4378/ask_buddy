@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Redirect requests that explicitly include .php to a 404 page or simply forbid them
+RewriteCond %{THE_REQUEST} \.php[\s?]
+RewriteRule ^ - [R=404,L]
+
+# If the request is for a file or directory that does not exist
+# And if appending .php results in a valid file
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
