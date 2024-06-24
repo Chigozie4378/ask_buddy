@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import mysql.connector
 import uuid
@@ -77,6 +77,10 @@ def get_db_connection():
 
 def generate_chat_id():
     return str(uuid.uuid4())
+
+@app.route('/')
+def index():
+    return render_template('app.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -163,4 +167,7 @@ def delete_conversation(chat_id):
     conn.close()
     return jsonify({"status": "success"})
 
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
