@@ -7,7 +7,7 @@ from langchain_community.agent_toolkits.load_tools import load_tools
 from dotenv import load_dotenv
 from langchain_cohere import CohereEmbeddings
 import os
-
+import psycopg2
 # Load environment variables
 load_dotenv()
 
@@ -66,12 +66,20 @@ session_info = {}
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
+# def get_db_connection():
+#     conn = mysql.connector.connect(
+#         host='localhost',
+#         user='root',
+#         password='',
+#         database='chigzeai'
+#     )
+#     return conn
 def get_db_connection():
-    conn = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='chigzeai'
+    conn = psycopg2.connect(
+        host=os.getenv('POSTGRES_HOST'),
+        database=os.getenv('POSTGRES_DB'),
+        user=os.getenv('POSTGRES_USER'),
+        password=os.getenv('POSTGRES_PASSWORD')
     )
     return conn
 
