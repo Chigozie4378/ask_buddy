@@ -1,5 +1,10 @@
+<?php
+include '../loader/init.php';
+Session::AuthViews();
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +16,7 @@
             position: relative;
             width: 100%;
         }
+
         .chat-input-container textarea {
             width: 100%;
             height: auto;
@@ -20,6 +26,7 @@
             padding-right: 50px;
             box-sizing: border-box;
         }
+
         .chat-input-container .send-icon {
             position: absolute;
             right: 15px;
@@ -28,14 +35,17 @@
             color: #17a2b8;
             font-size: 1.5rem;
         }
+
         #chat-body {
             height: calc(100vh - 160px);
             overflow-y: auto;
         }
+
         .thinking-gif {
             width: 50px;
             height: 50px;
         }
+
         .sidebar {
             position: fixed;
             left: 0;
@@ -43,18 +53,22 @@
             height: 100%;
             width: 250px;
             background-color: rgba(248, 249, 250, 0.95);
-            overflow-y: auto;
             border-right: 1px solid #ddd;
             z-index: 1050;
             transition: transform 0.3s ease, width 0.3s ease, border-radius 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
+
         .sidebar.collapsed {
             transform: translateX(-100%);
         }
+
         .sidebar.open {
             width: 100%;
             border-radius: 15px;
         }
+
         .sidebar-item {
             display: flex;
             justify-content: space-between;
@@ -62,28 +76,34 @@
             padding: 10px;
             cursor: pointer;
         }
+
         .sidebar-item:hover {
             background-color: #e9ecef;
         }
+
         .trash-icon {
             cursor: pointer;
             color: #dc3545;
         }
+
         .toggle-button {
             display: none;
             cursor: pointer;
             font-size: 1.5rem;
         }
+
         @media (max-width: 768px) {
             .toggle-button {
                 display: block;
             }
+
             .sidebar {
                 width: 100%;
                 height: 100vh;
                 border-radius: 0;
                 transform: translateX(-100%);
             }
+
             .sidebar.open {
                 transform: translateX(0);
                 width: 100%;
@@ -93,42 +113,86 @@
                 margin-left: 5%;
                 margin-right: 5%;
             }
+
             .chat-container {
                 padding: 0;
                 width: 100%;
             }
+
             .chat-card {
                 border-radius: 0;
                 height: 100vh;
                 margin: 0;
                 width: 100%;
             }
+
             .no-gutters {
                 margin-right: 0;
                 margin-left: 0;
             }
-            .no-gutters > .col,
-            .no-gutters > [class*="col-"] {
+
+            .no-gutters>.col,
+            .no-gutters>[class*="col-"] {
                 padding-right: 0;
                 padding-left: 0;
             }
         }
+
+        .user-name {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .logout-button {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 15px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .close-sidebar-btn {
+                display: block;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="row no-gutter">
             <div class="sidebar" id="sidebar">
-                <div class="d-flex justify-content-end p-2">
-                    <i class="fas fa-times toggle-button" id="close-sidebar"></i>
+                <div class="close-sidebar-btn" id="close-sidebar">
+                    <i class="fas fa-times"></i>
                 </div>
-                <!-- Previous conversations will be loaded here -->
+                <div class="user-name">
+                    <strong>Hi <?php echo $_SESSION['name']; ?></strong>
+                </div>
+                <div class="conversation-list" id="conversation-list">
+                    <!-- Previous conversations will be loaded here -->
+                </div>
+                <div class="logout-button">
+                    <a href="logout" class="btn btn-danger btn-block">Logout</a>
+                </div>
             </div>
-            <div class="col-md-9 offset-md-3 chat-container">
+            <div class="col-md-10 offset-md-2 col-lg-9 offset-lg-3 col-xl-8 offset-xl-4 chat-container">
                 <section>
                     <div class="container">
                         <div class="row d-flex justify-content-center">
-                            <div class="col-md-8 col-lg-6 col-xl-4">
+                            <div class="col-12">
                                 <div class="card chat-card" id="chat1" style="border-radius: 15px; height: 100vh;">
                                     <div class="card-header d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
                                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
@@ -139,10 +203,12 @@
                                     <div class="card-body" id="chat-body">
                                         <!-- Chat messages will be inserted here -->
                                     </div>
-                                    <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+                                    <div
+                                        class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
                                         <div class="chat-input-container">
-                                            <textarea class="form-control" id="chat-input" placeholder="Type message" aria-label="Recipient's username"
-                                                aria-describedby="button-addon2" rows="1"></textarea>
+                                            <textarea class="form-control" id="chat-input" placeholder="Type message"
+                                                aria-label="Recipient's username" aria-describedby="button-addon2"
+                                                rows="1"></textarea>
                                             <i class="fas fa-paper-plane send-icon" id="button-addon2"></i>
                                         </div>
                                     </div>
@@ -159,7 +225,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const textarea = document.querySelector('textarea');
             const sendIcon = document.querySelector('.send-icon');
             const chatBody = document.getElementById('chat-body');
@@ -167,19 +233,15 @@
             const sidebar = document.getElementById('sidebar');
             const openSidebarButton = document.getElementById('open-sidebar');
             const closeSidebarButton = document.getElementById('close-sidebar');
+            const userId = '<?php echo $_SESSION['user_id']; ?>';
 
-            textarea.addEventListener('input', function() {
+            textarea.addEventListener('input', function () {
                 this.style.height = 'auto';
                 this.style.height = (this.scrollHeight) + 'px';
-                
-                if (this.scrollHeight > parseInt(window.getComputedStyle(this).maxHeight)) {
-                    this.style.overflowY = 'auto';
-                } else {
-                    this.style.overflowY = 'hidden';
-                }
+                this.style.overflowY = this.scrollHeight > parseInt(window.getComputedStyle(this).maxHeight) ? 'auto' : 'hidden';
             });
 
-            sendIcon.addEventListener('click', function() {
+            sendIcon.addEventListener('click', function () {
                 const message = textarea.value;
                 if (message.trim() !== '') {
                     sendMessage(message);
@@ -189,47 +251,43 @@
                 }
             });
 
-            clearChatButton.addEventListener('click', function() {
+            clearChatButton.addEventListener('click', function () {
                 clearChat();
             });
 
-            openSidebarButton.addEventListener('click', function() {
+            openSidebarButton.addEventListener('click', function () {
                 sidebar.classList.add('open');
             });
 
-            closeSidebarButton.addEventListener('click', function() {
+            closeSidebarButton.addEventListener('click', function () {
                 sidebar.classList.remove('open');
             });
 
             function sendMessage(message) {
-                appendMessage('You', message, 'human.jpg');
+                appendMessage('You', message, '../assets/images/human.jpg');
                 showThinking();
-                
+
                 fetch('http://localhost:5000/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: message })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, user_id: userId })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    hideThinking();
-                    appendMessage('Bot', data.response, 'aibot.avif');
-                })
-                .catch(error => console.error('Error:', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        hideThinking();
+                        appendMessage('Bot', data.response, '../assets/images/aibot.avif');
+                    })
+                    .catch(error => console.error('Error:', error));
             }
 
             function clearChat() {
-                fetch('http://localhost:5000/clear', {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    chatBody.innerHTML = '';
-                    loadConversations();
-                })
-                .catch(error => console.error('Error:', error));
+                fetch('http://localhost:5000/clear', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        chatBody.innerHTML = '';
+                        loadConversations();
+                    })
+                    .catch(error => console.error('Error:', error));
             }
 
             function appendMessage(sender, message, avatar) {
@@ -248,9 +306,7 @@
             function showThinking() {
                 const thinkingElement = document.createElement('div');
                 thinkingElement.classList.add('thinking');
-                thinkingElement.innerHTML = `
-                    <img src="chat.gif" alt="Thinking..." class="thinking-gif">
-                `;
+                thinkingElement.innerHTML = `<img src="../assets/images/chat.gif" alt="Thinking..." class="thinking-gif">`;
                 chatBody.appendChild(thinkingElement);
                 chatBody.scrollTop = chatBody.scrollHeight;
             }
@@ -263,68 +319,66 @@
             }
 
             function loadConversations() {
-                fetch('http://localhost:5000/conversations')
-                .then(response => response.json())
-                .then(data => {
-                    sidebar.innerHTML = '<div class="d-flex justify-content-end p-2"><i class="fas fa-times toggle-button" id="close-sidebar"></i></div>';
-                    data.forEach(conversation => {
-                        const item = document.createElement('div');
-                        item.classList.add('sidebar-item');
-                        item.dataset.chatId = conversation[0];  // Assuming chat_id is at index 0
+                fetch(`http://localhost:5000/conversations?user_id=${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const conversationList = document.getElementById('conversation-list');
+                        conversationList.innerHTML = '';
+                        data.forEach(conversation => {
+                            const item = document.createElement('div');
+                            item.classList.add('sidebar-item');
+                            item.dataset.chatId = conversation[0];
 
-                        const titleSpan = document.createElement('span');
-                        titleSpan.textContent = conversation[1];  // Assuming chat_title is at index 1
-                        titleSpan.addEventListener('click', function() {
-                            loadConversation(item.dataset.chatId);
-                            if (window.innerWidth <= 768) {
-                                sidebar.classList.remove('open');
-                            }
+                            const titleSpan = document.createElement('span');
+                            titleSpan.textContent = conversation[1];
+                            titleSpan.addEventListener('click', function () {
+                                loadConversation(item.dataset.chatId);
+                                if (window.innerWidth <= 768) {
+                                    sidebar.classList.remove('open');
+                                }
+                            });
+
+                            const trashIcon = document.createElement('i');
+                            trashIcon.classList.add('fas', 'fa-trash', 'trash-icon');
+                            trashIcon.addEventListener('click', function (event) {
+                                event.stopPropagation();
+                                deleteConversation(item.dataset.chatId);
+                            });
+
+                            item.appendChild(titleSpan);
+                            item.appendChild(trashIcon);
+                            conversationList.appendChild(item);
                         });
-
-                        const trashIcon = document.createElement('i');
-                        trashIcon.classList.add('fas', 'fa-trash', 'trash-icon');
-                        trashIcon.addEventListener('click', function(event) {
-                            event.stopPropagation();
-                            deleteConversation(item.dataset.chatId);
-                        });
-
-                        item.appendChild(titleSpan);
-                        item.appendChild(trashIcon);
-                        sidebar.appendChild(item);
+                    })
+                    .catch(error => {
+                        console.error('Error loading conversations:', error);
                     });
-
-                    document.getElementById('close-sidebar').addEventListener('click', function() {
-                        sidebar.classList.remove('open');
-                    });
-                })
-                .catch(error => console.error('Error:', error));
             }
 
             function loadConversation(chat_id) {
-                fetch(`http://localhost:5000/conversation/${chat_id}`)
-                .then(response => response.json())
-                .then(data => {
-                    chatBody.innerHTML = '';
-                    data.chat_history.forEach(message => {
-                        appendMessage(message.sender, message.content, message.sender === 'User' ? 'human.jpg' : 'aibot.avif');
-                    });
-                })
-                .catch(error => console.error('Error:', error));
+                fetch(`http://localhost:5000/conversation/${chat_id}?user_id=${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        chatBody.innerHTML = '';
+                        data.chat_history.forEach(message => {
+                            appendMessage(message.sender, message.content, message.sender === 'User' ? '../assets/images/human.jpg' : '../assets/images/aibot.avif');
+                        });
+                    })
+                    .catch(error => console.error('Error loading conversation:', error));
             }
 
             function deleteConversation(chat_id) {
-                fetch(`http://localhost:5000/delete_conversation/${chat_id}`, {
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    loadConversations();
-                })
-                .catch(error => console.error('Error:', error));
+                fetch(`http://localhost:5000/delete_conversation/${chat_id}?user_id=${userId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadConversations();
+                    })
+                    .catch(error => console.error('Error deleting conversation:', error));
             }
 
             loadConversations();
         });
     </script>
 </body>
+
 </html>

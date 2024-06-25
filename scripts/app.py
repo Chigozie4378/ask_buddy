@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
 import uuid
@@ -7,7 +7,7 @@ from langchain_community.agent_toolkits.load_tools import load_tools
 from dotenv import load_dotenv
 from langchain_cohere import CohereEmbeddings
 import os
-import psycopg2
+
 # Load environment variables
 load_dotenv()
 
@@ -66,35 +66,24 @@ session_info = {}
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
-# def get_db_connection():
-#     conn = mysql.connector.connect(
-#         host='localhost',
-#         user='root',
-#         password='',
-#         database='chigzeai'
-#     )
-#     return conn
 def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('POSTGRES_HOST'),
-        database=os.getenv('POSTGRES_DB'),
-        user=os.getenv('POSTGRES_USER'),
-        password=os.getenv('POSTGRES_PASSWORD')
+    conn = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='chigzeai'
     )
     return conn
 
 def generate_chat_id():
     return str(uuid.uuid4())
 
-@app.route('/')
-def index():
-    return render_template('app.html')
-
 @app.route('/chat', methods=['POST'])
 def chat():
     global chat_history
     global session_info
     user_input = request.json.get('message')
+    user_id = request.json.get('user_id')
 
     if not chat_history:
         session_info['chat_id'] = generate_chat_id()
@@ -120,7 +109,7 @@ def chat():
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO chat_history (user_id, chat_id, chat_title, human_message, ai_message) VALUES (%s, %s, %s, %s, %s)",
-        ("user_1", chat_id, chat_title, user_input, response['output'])
+        (user_id, chat_id, chat_title, user_input, response['output'])
     )
     conn.commit()
     conn.close()
@@ -137,9 +126,10 @@ def clear():
 
 @app.route('/conversations', methods=['GET'])
 def get_conversations():
+    user_id = request.args.get('user_id')
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT DISTINCT chat_id, chat_title FROM chat_history WHERE user_id = %s", ("user_1",))
+    cursor.execute("SELECT DISTINCT chat_id, chat_title FROM chat_history WHERE user_id = %s", (user_id,))
     conversations = cursor.fetchall()
     conn.close()
     return jsonify(conversations)
@@ -148,9 +138,10 @@ def get_conversations():
 def get_conversation(chat_id):
     global chat_history
     global session_info
+    user_id = request.args.get('user_id')
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT human_message, ai_message, chat_title FROM chat_history WHERE chat_id = %s", (chat_id,))
+    cursor.execute("SELECT human_message, ai_message, chat_title FROM chat_history WHERE chat_id = %s AND user_id = %s", (chat_id, user_id))
     chat_history = []
     full_chat_history = []
     chat_title = None
@@ -168,14 +159,13 @@ def get_conversation(chat_id):
 
 @app.route('/delete_conversation/<chat_id>', methods=['DELETE'])
 def delete_conversation(chat_id):
+    user_id = request.args.get('user_id')
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM chat_history WHERE chat_id = %s", (chat_id,))
+    cursor.execute("DELETE FROM chat_history WHERE chat_id = %s AND user_id = %s", (chat_id, user_id))
     conn.commit()
     conn.close()
     return jsonify({"status": "success"})
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
+if __name__ == '__main__':
+    app.run(debug=True)
