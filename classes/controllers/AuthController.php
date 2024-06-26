@@ -39,6 +39,8 @@ class AuthController extends UserModel
                 $_SESSION['user_id'] = $result['id'];
                 $_SESSION['name'] = $result['name'];
                 $_SESSION['email'] = $result['email'];
+                pclose(popen("start /b C:\\xampp\\htdocs\\ask_buddy\\start_flask.bat", "r"));
+                sleep(1);
                 header("location: chat");
             } else {
                 $error = "Error registering user.";
@@ -64,6 +66,7 @@ class AuthController extends UserModel
                 $_SESSION["email"] = $row["email"];
                 $_SESSION["user_id"] = $row["id"];
                 pclose(popen("start /b C:\\xampp\\htdocs\\ask_buddy\\start_flask.bat", "r"));
+                sleep(1);
                 header("location:chat");
             } else {
                 $error = "Invalid email or password.";
@@ -109,6 +112,7 @@ class AuthController extends UserModel
     }
     public function logout()
     {
+        pclose(popen("start /b C:\\xampp\\htdocs\\ask_buddy\\stop_flask.bat", "r"));
         session_destroy();
         header("location:../index");
     }

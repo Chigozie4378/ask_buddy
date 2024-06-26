@@ -65,8 +65,7 @@ Session::AuthViews();
         }
 
         .sidebar.open {
-            width: 100%;
-            border-radius: 15px;
+            transform: translateX(0);
         }
 
         .sidebar-item {
@@ -98,7 +97,7 @@ Session::AuthViews();
             }
 
             .sidebar {
-                width: 100%;
+                width: 100vw;
                 height: 100vh;
                 border-radius: 0;
                 transform: translateX(-100%);
@@ -106,24 +105,20 @@ Session::AuthViews();
 
             .sidebar.open {
                 transform: translateX(0);
-                width: 100%;
-                border-radius: 15px;
-                padding-left: 7%;
-                padding-right: 10%;
-                margin-left: 5%;
-                margin-right: 5%;
+                border-radius: 16px !important;
+                padding: 0;
             }
 
             .chat-container {
                 padding: 0;
-                width: 100%;
+                width: 100vw;
             }
 
             .chat-card {
                 border-radius: 0;
                 height: 100vh;
                 margin: 0;
-                width: 100%;
+                width: 100vw;
             }
 
             .no-gutters {
@@ -172,9 +167,9 @@ Session::AuthViews();
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row no-gutter">
-            <div class="sidebar" id="sidebar">
+    <div class="container-fluid p-0">
+        <div class="row no-gutters">
+            <div class="col-md-3 col-lg-3 col-xl-3 sidebar" id="sidebar">
                 <div class="close-sidebar-btn" id="close-sidebar">
                     <i class="fas fa-times"></i>
                 </div>
@@ -188,12 +183,12 @@ Session::AuthViews();
                     <a href="logout" class="btn btn-danger btn-block">Logout</a>
                 </div>
             </div>
-            <div class="col-md-10 offset-md-2 col-lg-9 offset-lg-3 col-xl-8 offset-xl-4 chat-container">
+            <div class="col-12 col-md-9 offset-md-3 chat-container">
                 <section>
-                    <div class="container">
-                        <div class="row d-flex justify-content-center">
+                    <div class="container-fluid p-0">
+                        <div class="row no-gutters">
                             <div class="col-12">
-                                <div class="card chat-card" id="chat1" style="border-radius: 15px; height: 100vh;">
+                                <div class="card chat-card" id="chat1" style="height: 100vh;margin-right:7%">
                                     <div class="card-header d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
                                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
                                         <p class="mb-0 fw-bold d-none d-md-block">Live chat</p>
@@ -294,14 +289,15 @@ Session::AuthViews();
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
                 messageElement.innerHTML = `
-                    <img src="${avatar}" alt="${sender} avatar" style="width: 45px; height: 100%;">
-                    <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
-                        <p class="small mb-0"><strong>${sender}:</strong> ${message}</p>
-                    </div>
-                `;
+                <img src="${avatar}" alt="${sender} avatar" style="width: 45px; height: 100%;">
+                <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
+                    <p class="small mb-0">${message}</p>
+                </div>
+            `;
                 chatBody.appendChild(messageElement);
                 chatBody.scrollTop = chatBody.scrollHeight;
             }
+
 
             function showThinking() {
                 const thinkingElement = document.createElement('div');
