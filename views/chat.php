@@ -8,9 +8,22 @@ Session::AuthViews();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <title>Chatbot Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
     <style>
         .chat-input-container {
             position: relative;
@@ -198,8 +211,7 @@ Session::AuthViews();
                                     <div class="card-body" id="chat-body">
                                         <!-- Chat messages will be inserted here -->
                                     </div>
-                                    <div
-                                        class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+                                    <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
                                         <div class="chat-input-container">
                                             <textarea class="form-control" id="chat-input" placeholder="Type message"
                                                 aria-label="Recipient's username" aria-describedby="button-addon2"
@@ -289,15 +301,19 @@ Session::AuthViews();
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
                 messageElement.innerHTML = `
-                <img src="${avatar}" alt="${sender} avatar" style="width: 45px; height: 100%;">
-                <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
-                    <p class="small mb-0">${message}</p>
-                </div>
-            `;
+                    <img src="${avatar}" alt="${sender} avatar" style="width: 45px; height: 100%;">
+                    <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
+                        <p class="small mb-0">${marked.parse(message)}</p>
+                    </div>
+                `;
                 chatBody.appendChild(messageElement);
                 chatBody.scrollTop = chatBody.scrollHeight;
-            }
 
+                // Tell MathJax to scan the new content
+                MathJax.typesetPromise([messageElement]).catch(function (err) {
+                    console.error('MathJax render error:', err);
+                });
+            }
 
             function showThinking() {
                 const thinkingElement = document.createElement('div');

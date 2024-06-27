@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to HTML with MathJax</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+</head>
+<body>
+
+<div id="markdown-container">
+    # Sample Markdown
+
+    This is a sample markdown text with inline math $E = mc^2$ and a displayed equation:
+
+    $$\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$$
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('markdown-container');
+        const markdownText = container.innerText;
+        container.innerHTML = marked.parse(markdownText);
+
+        // After converting markdown to HTML, typeset the math
+        MathJax.typesetPromise([container]);
+    });
+</script>
+
+</body>
+</html>
